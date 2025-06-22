@@ -1,33 +1,36 @@
 #include <bits/stdc++.h>
-#include <iostream>
-#define ll long long
-#define fast ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-
 using namespace std;
 
 int main() {
-
-    int N, K;
-    cin >> N >> K;
-    vector<int> A(N);
-    for (int i = 0; i < N; i++) {
-        cin >> A[i];
+    int n, k;
+    cin >> n >> k;
+    vector< int > a(n + 2);
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
     }
-    
-    priority_queue<ll> maxHeap;
-   
-    for (int i = 0; i < N; i++) {
-        long long sum = 0;
-        for (int j = i; j < N; j++) {
-            sum += A[j];  
-            maxHeap.push(sum);
+    priority_queue< tuple< long long , int , int > > pq;
+    set< pair< int , int > > st;
+
+    vector< long long > ans;
+
+    auto add = [&](long long sum, int l, int r) {
+        if( 1 <= l && l <= r && r <= n && st.find({l, r}) == st.end()) {
+            pq.push({ sum , l, r });
+            st.insert({l, r});
         }
+    };
+    add(accumulate(a.begin() + 1, a.end(), 0ll), 1, n);
+    while((int)ans.size() < k) {
+        auto [sum, l, r] = pq.top();
+        ans.push_back(sum);
+        pq.pop();
+        add(sum - a[l], l + 1, r);
+        add(sum - a[r], l, r - 1);
+        add(sum + a[l - 1], l - 1, r);
+        add(sum + a[r + 1], l, r + 1);
     }
-    
-    for (int i = 0; i < K; i++) {
-        cout << maxHeap.top() << " ";
-        maxHeap.pop();
+    for(auto &x : ans) {
+        cout << x << ' ';
     }
-
     return 0;
 }
